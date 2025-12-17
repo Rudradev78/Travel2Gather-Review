@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel2Gather - Review</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #000080; /* A nice travel/nature green */
+            --bg-color: #f8f9fa;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding-top: 30px; }
+        
+        .card { background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 420px; text-align: center; }
+        
+        header img { width: 90px; height: 90px; border-radius: 20px; margin-bottom: 15px; object-fit: cover; background: #eee; }
+        header h2 { margin: 0 0 5px 0; color: #333; }
+        header p { color: #666; margin-bottom: 30px; font-size: 14px; }
+
+        .form-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; font-size: 14px; }
+        
+        input, textarea, select { 
+            width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; 
+            box-sizing: border-box; font-size: 16px; transition: all 0.3s; 
+        }
+        
+        input:focus, textarea:focus, select:focus { border-color: var(--primary-color); outline: none; background: #fff; }
+        
+        button { 
+            width: 100%; padding: 15px; background: var(--primary-color); color: white; 
+            border: none; border-radius: 10px; cursor: pointer; font-size: 16px; 
+            font-weight: bold; margin-top: 10px; transition: transform 0.2s;
+        }
+        
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Thank You Section */
+        #thankYouState { display: none; padding: 40px 0; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .success-icon { color: var(--primary-color); font-size: 70px; margin-bottom: 20px; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="formState">
+        <header>
+            <img src="T2G.png" alt="Travel2Gather Logo" onerror="this.src='https://via.placeholder.com/90?text=T2G'">
+            <h2>Travel2Gather</h2>
+            <p>We'd love to hear about your experience!</p>
+        </header>
+
+        <form id="reviewForm">
+            <div class="form-group">
+                <label for="userName">Full Name</label>
+                <input type="text" id="userName" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="userRating">Rating (1-10)</label>
+                <select id="userRating" required>
+                    <option value="">Rate your trip...</option>
+                    <option value="10">10 - Amazing</option>
+                    <option value="9">9 - Great</option>
+                    <option value="8">8 - Good</option>
+                    <option value="7">7 - Satisfactory</option>
+                    <option value="6">6 - Okay</option>
+                    <option value="5">5 - Average</option>
+                    <option value="4">4 - Poor</option>
+                    <option value="3">3 - Bad</option>
+                    <option value="2">2 - Very Bad</option>
+                    <option value="1">1 - Terrible</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="userReview">Your Review</label>
+                <textarea id="userReview" rows="4" placeholder="How was your journey?" required></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">Send Feedback</button>
+        </form>
+    </div>
+
+    <div id="thankYouState">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>Thank You!</h1>
+        <p>Your review has been traveling to our database and arrived safely.</p>
+        <button onclick="location.reload()" style="background: #000080;">Write Another</button>
+    </div>
+</div>
+
+<script type="module">
+  // Using version 10.7.1 as it's the most stable widely used CDN version
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Your verified configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBLXg9wrvLD4YccJPgLh_7_BzlcgHSMs1w",
+    authDomain: "travel2gather-review.firebaseapp.com",
+    projectId: "travel2gather-review",
+    storageBucket: "travel2gather-review.firebasestorage.app",
+    messagingSenderId: "108377454544",
+    appId: "1:108377454544:web:cdd426f04a401f34636bd5",
+    measurementId: "G-DWSG37TQ7Q"
+  };
+
+  // Initialize
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const reviewForm = document.getElementById('reviewForm');
+  const formState = document.getElementById('formState');
+  const thankYouState = document.getElementById('thankYouState');
+
+  reviewForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('submitBtn');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Sending...";
+
+    try {
+      await addDoc(collection(db, "reviews"), {
+        name: document.getElementById('userName').value,
+        rating: Number(document.getElementById('userRating').value),
+        review: document.getElementById('userReview').value,
+        timestamp: serverTimestamp()
+      });
+
+      // Show Thank You Page
+      formState.style.display = 'none';
+      thankYouState.style.display = 'block';
+
+    } catch (error) {
+      console.error("Firebase Error:", error);
+      alert("Error: Make sure your Firestore Rules are set to public/test mode!");
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Send Feedback";
+    }
+  });
+</script>
+
+</body>
+</html>
