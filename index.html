@@ -16,7 +16,7 @@
         .card { background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 420px; text-align: center; }
         
         header img { width: 90px; height: 90px; border-radius: 20px; margin-bottom: 15px; object-fit: cover; background: #eee; }
-        header h2 { margin: 0 0 5px 0; color: #333; }
+        header h2 { margin: 0 0 5px 0; color: #000080; }
         header p { color: #666; margin-bottom: 30px; font-size: 14px; }
 
         .form-group { text-align: left; margin-bottom: 20px; }
@@ -55,25 +55,26 @@
         <header>
             <img src="T2G.png" alt="Travel2Gather Logo" onerror="this.src='https://via.placeholder.com/90?text=T2G'">
             <h2>Travel2Gather</h2>
+            <p style="color:#000080">#Never Travel Alone Again</p>
             <p>We'd love to hear about your review!</p>
         </header>
 
         <form id="reviewForm">
             <div class="form-group">
-                <label for="userName">Full Name</label>
+                <label for="userName">Name</label>
                 <input type="text" id="userName" placeholder="Enter your name" required>
             </div>
 
             <div class="form-group">
                 <label for="userRating">Rating (1-10)</label>
                 <select id="userRating" required>
-                    <option value="">Rate your trip...</option>
+                    <option value="">Rate Our Idea</option>
                     <option value="10">10 - Amazing</option>
                     <option value="9">9 - Great</option>
                     <option value="8">8 - Good</option>
                     <option value="7">7 - Satisfactory</option>
-                    <option value="6">6 - Okay</option>
-                    <option value="5">5 - Average</option>
+                    <option value="6">6 - Average</option>
+                    <option value="5">5 - Okay</option>
                     <option value="4">4 - Poor</option>
                     <option value="3">3 - Bad</option>
                     <option value="2">2 - Very Bad</option>
@@ -95,7 +96,7 @@
             <i class="fas fa-check-circle"></i>
         </div>
         <h1>Thank You!</h1>
-        <p>Your review is </p>
+        <p>We truly appreciate you taking the time to share your thought. Your words about our idea inspire us!</p>
         <button onclick="location.reload()" style="background: #000080;">Write Another</button>
     </div>
 </div>
