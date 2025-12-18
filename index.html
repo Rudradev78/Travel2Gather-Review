@@ -64,6 +64,12 @@
                 <label for="userName">Name</label>
                 <input type="text" id="userName" placeholder="Enter your name" required>
             </div>
+            
+            <div class="form-group">
+                <label for="userEmail">Email Address(not mandatory)</label>
+                <input type="email" id="userEmail" placeholder="Enter your email">
+                <small>This is not mandatory. We just want to reach you.</small>
+            </div>
 
             <div class="form-group">
                 <label for="userRating">Rating (1-10)</label>
@@ -100,6 +106,7 @@
         <button onclick="location.reload()" style="background: #000080;">Write Another</button>
     </div>
 </div>
+    
 
 <script type="module">
   // Using version 10.7.1 as it's the most stable widely used CDN version
@@ -135,6 +142,7 @@
     try {
       await addDoc(collection(db, "reviews"), {
         name: document.getElementById('userName').value,
+        email: document.getElementById('userEmail').value,
         rating: Number(document.getElementById('userRating').value),
         review: document.getElementById('userReview').value,
         timestamp: serverTimestamp()
