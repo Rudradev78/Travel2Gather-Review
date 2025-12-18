@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel2Gather - Reviews Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: #2e7d32; margin-bottom: 5px; }
+        
+        /* Grid Layout for Cards */
+        #reviewsContainer { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+
+        /* Individual Card Styling */
+        .review-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .review-card:hover { transform: translateY(-5px); }
+
+        .name { font-weight: bold; font-size: 18px; color: #333; margin-bottom: 5px; display: block; }
+        
+        /* Rating Badge */
+        .rating-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .review-text { color: #555; line-height: 1.5; font-style: italic; }
+        .date { font-size: 12px; color: #999; margin-top: 15px; display: block; }
+
+        .loading { text-align: center; font-size: 18px; color: #666; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Travel2Gather Reviews</h1>
+    <p>Real-time feedback from our travelers</p>
+</header>
+
+<div id="loading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i> Fetching reviews...
+</div>
+
+<div id="reviewsContainer"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // USE YOUR SAME CONFIG HERE
+  const firebaseConfig = {
+    apiKey: "AIzaSyBLXg9wrvLD4YccJPgLh_7_BzlcgHSMs1w",
+    authDomain: "travel2gather-review.firebaseapp.com",
+    projectId: "travel2gather-review",
+    storageBucket: "travel2gather-review.firebasestorage.app",
+    messagingSenderId: "108377454544",
+    appId: "1:108377454544:web:cdd426f04a401f34636bd5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadReviews() {
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    const loading = document.getElementById('loading');
+
+    try {
+      // Query "reviews" collection ordered by newest first
+      const q = query(collection(db, "reviews"), orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(q);
+      
+      loading.style.display = 'none';
+
+      if (querySnapshot.empty) {
+        reviewsContainer.innerHTML = "<p class='loading'>No reviews found yet.</p>";
+        return;
+      }
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : "Just now";
+        
+        const card = document.createElement('div');
+        card.className = 'review-card';
+        card.innerHTML = `
+            <span class="name">${data.name}</span>
+            <div class="rating-badge"><i class="fas fa-star"></i> ${data.rating}/10</div>
+            <p class="review-text">"${data.review}"</p>
+            <span class="date">Submitted on: ${date}</span>
+        `;
+        reviewsContainer.appendChild(card);
+      });
+
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      loading.innerHTML = "Error loading reviews. Check your Firebase Rules.";
+    }
+  }
+
+  loadReviews();
+</script>
+
+</body>
+</html>
