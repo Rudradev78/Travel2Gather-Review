@@ -112,6 +112,7 @@
         const card = document.createElement('div');
         card.className = 'review-card';
         card.innerHTML = `
+            <span class="email">${data.email ? data.email : "Not given"}</span>
             <span class="name">${data.name}</span>
             <div class="rating-badge"><i class="fas fa-star"></i> ${data.rating}/10</div>
             <p class="review-text">"${data.review}"</p>
